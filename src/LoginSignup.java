@@ -43,7 +43,7 @@ public class LoginSignup {
     public void storeUser() { //저장
         try {
             PrintWriter writeFile = new PrintWriter(new OutputStreamWriter(new FileOutputStream
-                    ("account.txt"), StandardCharsets.UTF_8));
+                    ("account.txt",false), StandardCharsets.UTF_8));
 
             for(User user:users) {
                 writeFile.println(user.getID()+ "\t" + user.getPW());

@@ -52,8 +52,7 @@ public class Main {
             System.out.println("<메뉴>");
             System.out.println("1.일정 확인");
             System.out.println("2.일정 등록");
-            System.out.println("3.일정 수정 및 삭제");
-            System.out.println("4.로그아웃");
+            System.out.println("3.로그아웃");
             System.out.println("--------------------------------------------");
             System.out.println("메뉴를 선택해주세요");
             System.out.print(">>");
@@ -75,8 +74,7 @@ public class Main {
             switch(input) {
                 case 1->Sc.ScheduleCheck();
                 case 2->Sc.AddSchedule();
-                case 3->Sc.UpdateDeleteMenu();
-                case 4->{
+                case 3->{
                     //저장 및 사용자 초기화
                     user = null;
                     Sc.storeSchedule();//로그아웃 시 스케줄 저장

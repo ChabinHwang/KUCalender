@@ -2,12 +2,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class FileManager {
     static FileManager Fm;
 
-
-    private FileManager() {
+    //있으면 안됨(중복)
+    /*private FileManager() {
         try{
             File file = new File("schedule.txt");
 
@@ -21,11 +23,11 @@ public class FileManager {
 
                     Schedule schedule = null;
 
-                    //memo가 없으면 parts의 길이 : 4
-                    if (parts.length == 4) {
-                        schedule = new Schedule(parts[0], parts[1], parts[2], parts[3], null);
-                    } else if (parts.length == 5) {
-                        schedule = new Schedule(parts[0], parts[1], parts[2], parts[3], parts[4]);
+                    //memo가 없으면 parts의 길이 : 5
+                    if (parts.length == 5) {
+                        schedule = new Schedule(parts[0], parts[1], parts[2], parts[3], Integer.parseInt(parts[4]),null);
+                    } else if (parts.length == 6) {
+                        schedule = new Schedule(parts[0], parts[1], parts[2], parts[3], Integer.parseInt(parts[4]),parts[5]);
                     }
 
                     // ScheduleManager의 schedules 리스트에 추가
@@ -39,7 +41,7 @@ public class FileManager {
         } catch (IOException e){
             System.err.println("데이터베이스에 문제가 있습니다.");
         }
-    }
+    }*/
 
     public static FileManager getInstance() {
         if (Fm == null) {
@@ -88,7 +90,7 @@ public class FileManager {
     public boolean isValidDate(String date) {
         if (date == null) return false;
 
-        String regex = "^\\d{4}([./_ -])\\d{2}\\1\\d{2}$"; //공백도 구분자임
+        String regex = "^\\d{4}([./_ -])\\d{2}\\1\\d{2}[~\\-]\\d{4}([./_ -])\\d{2}\\1\\d{2}$"; //공백도 구분자임
 
         if (!date.matches(regex)) {
             //System.out.println("정규표현식 불만족");
@@ -97,70 +99,88 @@ public class FileManager {
 
         char separator = date.charAt(4);
 
+        String[] part0 = date.split("[~\\-]");
         String[] part;
+        String[] dates = new String[2];
 
-        if (separator == '.') {
-            part = date.split("\\.");
-        } else {
-            part = date.split(String.valueOf(separator));
-        }
+        for(int i = 0; i < part0.length; i++) {
+            if (separator == '.') {
+                part = part0[i].split("\\.");
+            } else {
+                part = part0[i].split(String.valueOf(separator));
+            }
 
-        int YEAR = Integer.parseInt(part[0]);
-        int MONTH = Integer.parseInt(part[1]);
-        int DAY = Integer.parseInt(part[2]);
+            dates[i]=part[0]+"/"+part[1]+"/"+part[2];
 
-        //기본적인 년,월,달
-        if (YEAR <2024 || YEAR > 2099) {
-            //System.out.println("2024~2099사이의 숫자만 가능합니다.(YEAR)");
-            return false;
-        }
+            int YEAR = Integer.parseInt(part[0]);
+            int MONTH = Integer.parseInt(part[1]);
+            int DAY = Integer.parseInt(part[2]);
 
-        if (MONTH <1 || MONTH > 12) {
-            //System.out.println("1~12사이의 숫자만 가능합니다.(MONTH)");
-            return false;
-        }
-
-        if (DAY <1 || DAY > 31) {
-            //System.out.println("1~31사이의 숫자만 가능합니다.(DAY)");
-            return false;
-        }
-
-        //달에따라 다른 일수, 율리우스력
-        boolean isJulius = false; //isJulius == true -> 2월은 29일까지
-        boolean monthWith31Days = false; //사용되지 않는 변수이지만 가독성(집합의 관점)을 위해 선언
-        boolean monthWith30Days = false;
-        boolean monthWith28Days = false;
-        boolean monthWith29Days = false;
-
-        if (YEAR % 4 == 0) isJulius = true;
-        if (MONTH == 1 || MONTH == 3 || MONTH == 5 || MONTH == 7 || MONTH == 8 || MONTH == 10 || MONTH == 12)
-            monthWith31Days = true;
-        if (MONTH == 4 || MONTH == 6 || MONTH == 9 || MONTH == 11)
-            monthWith30Days = true;
-        if (MONTH == 2) {
-            if (isJulius) monthWith29Days = true;
-            else monthWith28Days = true;
-        }
-
-        if (monthWith30Days) {
-            if (DAY > 30) {
-                //System.out.println("해당 달은 30일까지만 있습니다.");
+            //기본적인 년,월,달
+            if (YEAR <2024 || YEAR > 2099) {
+                //System.out.println("2024~2099사이의 숫자만 가능합니다.(YEAR)");
                 return false;
             }
-        } else if (monthWith28Days) {
-            if (DAY > 28) {
-                //System.out.println("해당 달은 28일까지만 있습니다.");
+
+            if (MONTH <1 || MONTH > 12) {
+                //System.out.println("1~12사이의 숫자만 가능합니다.(MONTH)");
                 return false;
             }
-        } else if (monthWith29Days) {
-            if (DAY > 29) {
-                //System.out.println("해당 달은 29일까지만 있습니다.");
+
+            if (DAY <1 || DAY > 31) {
+                //System.out.println("1~31사이의 숫자만 가능합니다.(DAY)");
                 return false;
+            }
+
+            //달에따라 다른 일수, 율리우스력
+            boolean isJulius = false; //isJulius == true -> 2월은 29일까지
+            boolean monthWith31Days = false; //사용되지 않는 변수이지만 가독성(집합의 관점)을 위해 선언
+            boolean monthWith30Days = false;
+            boolean monthWith28Days = false;
+            boolean monthWith29Days = false;
+
+            if (YEAR % 4 == 0) isJulius = true;
+            if (MONTH == 1 || MONTH == 3 || MONTH == 5 || MONTH == 7 || MONTH == 8 || MONTH == 10 || MONTH == 12)
+                monthWith31Days = true;
+            if (MONTH == 4 || MONTH == 6 || MONTH == 9 || MONTH == 11)
+                monthWith30Days = true;
+            if (MONTH == 2) {
+                if (isJulius) monthWith29Days = true;
+                else monthWith28Days = true;
+            }
+
+            if (monthWith30Days) {
+                if (DAY > 30) {
+                    //System.out.println("해당 달은 30일까지만 있습니다.");
+                    return false;
+                }
+            } else if (monthWith28Days) {
+                if (DAY > 28) {
+                    //System.out.println("해당 달은 28일까지만 있습니다.");
+                    return false;
+                }
+            } else if (monthWith29Days) {
+                if (DAY > 29) {
+                    //System.out.println("해당 달은 29일까지만 있습니다.");
+                    return false;
+                }
             }
         }
 
         //System.out.println("모든 문법/의미규칙 만족");
-        return true;
+        return isSameOrLater(dates[0],dates[1]);
+    }
+
+    public static boolean isSameOrLater(String date1, String date2) {
+        // 날짜 형식 정의
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+
+        // 문자열을 LocalDate로 변환
+        LocalDate parsedDate1 = LocalDate.parse(date1, formatter);
+        LocalDate parsedDate2 = LocalDate.parse(date2, formatter);
+
+        // 같은 날짜이거나 두 번째 날짜가 더 나중인지 확인
+        return !parsedDate1.isAfter(parsedDate2);
     }
 
     public boolean isValidTime(String time) {
@@ -178,7 +198,7 @@ public class FileManager {
         String start = part[0];
         String end = part[1];
 
-        System.out.println(start +"~" + end);
+        //System.out.println(start +"~" + end);
 
         if (start.compareTo(end) >= 0) {
             //System.out.println("시작시각이 끝나는시각보다 앞서야 합니다.");
@@ -194,6 +214,9 @@ public class FileManager {
         int E_HOUR = Integer.parseInt(E[0]);
         int E_MIN = Integer.parseInt(E[1]);
 
+
+
+
         if (S_HOUR < 0 || S_MIN < 0 || E_HOUR < 0 || E_MIN < 0) {
             //System.out.println("시간과 분은 0보다 커야합니다.");
             return false;
@@ -204,6 +227,8 @@ public class FileManager {
             return false;
         }
 
+
+
         return true;
     }
 
@@ -212,5 +237,9 @@ public class FileManager {
 
         int len = memo.length();
         return len<= 100;
+    }
+
+    public boolean isValidAccess(int access) {
+        return access >= 1 && access <= 2;
     }
 }

@@ -4,25 +4,40 @@ public class Schedule {
     String time;
     String title;
     String memo;
+    int access;
 
-    public Schedule(String ID,String title,String date,String time,String memo) {
+    public Schedule(String ID,String title,String date,String time,int access,String memo) {
         this.ID =ID;
         this.date = date;
         this.time = time;
         this.title = title;
+        this.access = access;
         this.memo = memo;
     }
 
     public void printSchedule(){
-        System.out.print(date+" ");
-        System.out.print("("+time+")-");
-        System.out.println(title);
+        String[] partDate = date.split("[~\\-]");
+        String[] partTime = time.split("[~\\-]");
+
+        if(partDate[0].equals(partDate[1])){
+            System.out.println(partDate[0]+" "+partTime[0]+" ~ "+partTime[1]+" - "+title);
+        }
+        else{
+            System.out.println(partDate[0]+" "+partTime[0]+" ~ "+partDate[1]+" "+partTime[1]+" - "+title);
+        }
     }
 
     public void printScheduleAddMemo(){
-        System.out.print(date+" ");
-        System.out.print("("+time+")-");
-        System.out.println(title);
-        System.out.println("메모: "+memo);
+        String[] partDate = date.split("[~\\-]");
+        String[] partTime = time.split("[~\\-]");
+
+        if(partDate[0].equals(partDate[1])){
+            System.out.println(partDate[0]+" "+partTime[0]+" ~ "+partTime[1]+" - "+title);
+            System.out.println("메모 : "+memo);
+        }
+        else{
+            System.out.println(partDate[0]+" "+partTime[0]+" ~ "+partDate[1]+" "+partTime[1]+" - "+title);
+            System.out.println("메모 : "+memo);
+        }
     }
 }
