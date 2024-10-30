@@ -90,7 +90,7 @@ public class FileManager {
     public boolean isValidDate(String date) {
         if (date == null) return false;
 
-        String regex = "^\\d{4}([./_ -])\\d{2}\\1\\d{2}[~\\-]\\d{4}([./_ -])\\d{2}\\1\\d{2}$"; //공백도 구분자임
+        String regex = "^\\d{4}([./_-])\\d{2}\\1\\d{2} \\d{4}([./_-])\\d{2}\\1\\d{2}$"; //공백도 구분자임
 
         if (!date.matches(regex)) {
             //System.out.println("정규표현식 불만족");
@@ -99,7 +99,7 @@ public class FileManager {
 
         char separator = date.charAt(4);
 
-        String[] part0 = date.split("[~\\-]");
+        String[] part0 = date.split(" ");
         String[] part;
         String[] dates = new String[2];
 
@@ -183,27 +183,29 @@ public class FileManager {
         return !parsedDate1.isAfter(parsedDate2);
     }
 
-    public boolean isValidTime(String time) {
+    public boolean isValidTime(String time,boolean oneDay) {
         if (time == null) return false;
 
-        String regex = "^\\d{2}:\\d{2}[~\\-]\\d{2}:\\d{2}$";
+        String regex = "^\\d{2}:\\d{2} \\d{2}:\\d{2}$";
 
         if (!time.matches(regex)) {
             //System.out.println("HH:MM~HH:MM 형태로 작성 바랍니다.");
             return false;
         }
 
-        String[] part = time.split("[~\\-]");
+        String[] part = time.split(" ");
 
         String start = part[0];
         String end = part[1];
 
         //System.out.println(start +"~" + end);
-
-        if (start.compareTo(end) >= 0) {
-            //System.out.println("시작시각이 끝나는시각보다 앞서야 합니다.");
-            return false;
+        if(oneDay){
+            if (start.compareTo(end) >= 0) {
+                //System.out.println("시작시각이 끝나는시각보다 앞서야 합니다.");
+                return false;
+            }
         }
+
 
         //시,분의 숫자 범위
         String[] S = start.split(":");

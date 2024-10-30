@@ -16,8 +16,8 @@ public class Schedule {
     }
 
     public void printSchedule(){
-        String[] partDate = date.split("[~\\-]");
-        String[] partTime = time.split("[~\\-]");
+        String[] partDate = date.split(" ");
+        String[] partTime = time.split(" ");
 
         if(partDate[0].equals(partDate[1])){
             System.out.println(partDate[0]+" "+partTime[0]+" ~ "+partTime[1]+" - "+title);
@@ -28,8 +28,8 @@ public class Schedule {
     }
 
     public void printScheduleAddMemo(){
-        String[] partDate = date.split("[~\\-]");
-        String[] partTime = time.split("[~\\-]");
+        String[] partDate = date.split(" ");
+        String[] partTime = time.split(" ");
 
         if(partDate[0].equals(partDate[1])){
             System.out.println(partDate[0]+" "+partTime[0]+" ~ "+partTime[1]+" - "+title);

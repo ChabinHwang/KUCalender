@@ -117,6 +117,7 @@ public class ScheduleManager {
         System.out.println("[일정 등록]");
         String title, date, time, memo;
         int access;
+        boolean oneDay;
 
         while(true){
             System.out.print("일정의 제목을 입력하세요\n>>");
@@ -133,6 +134,8 @@ public class ScheduleManager {
             System.out.print("날짜를 입력하세요\n>>");
             date = Main.scan.nextLine();
             if(FileManager.getInstance().isValidDate(date)){
+                String[] part = date.split(" ");
+                oneDay = part[0].equals(part[1]);
                 break;
             }
             else{
@@ -142,7 +145,7 @@ public class ScheduleManager {
         while(true){
             System.out.print("시간을 입력하세요\n>>");
             time = Main.scan.nextLine();
-            if(FileManager.getInstance().isValidTime(time)){
+            if(FileManager.getInstance().isValidTime(time,oneDay)){
                 break;
             }
             else{
@@ -194,13 +197,14 @@ public class ScheduleManager {
         int n = 1;
         int selectSchedule;
         ArrayList<Schedule> schedulesOfID = getSchedulesOfID(ID);//사용자의 스케줄 List
+        System.out.println("[일정]");
 
         if(schedulesOfID.isEmpty()) {
             System.out.println("등록된 일정이 없습니다");
             System.out.println("--------------------------------------------");
             return null;
         }
-        System.out.println("[일정]");
+
         System.out.println("<공개>");
         List<Schedule> publicSchedules = schedulesOfID.stream().filter(a->a.access==1).toList();
         for(Schedule schedule:publicSchedules) {
@@ -385,10 +389,14 @@ public class ScheduleManager {
     private void UpdateTime(Schedule schedule) {
         System.out.println("[시간 수정]");
         String time;
+        boolean oneDay;
+        String[] part = schedule.time.split(" ");
+        oneDay = part[0].equals(part[1]);
+
         while(true) {
             System.out.print("일정의 시간을 입력하세요\n>>");
             time = Main.scan.nextLine();
-            if(FileManager.getInstance().isValidTime(time)){
+            if(FileManager.getInstance().isValidTime(time,oneDay)){
                 break;
             }
             else{
