@@ -33,11 +33,19 @@ public class Schedule {
 
         if(partDate[0].equals(partDate[1])){
             System.out.println(partDate[0]+" "+partTime[0]+" ~ "+partTime[1]+" - "+title);
-            System.out.println("메모 : "+memo);
+            if(memo==null){
+                System.out.println("메모 : ");
+            }
+            else
+                System.out.println("메모 : "+memo);
         }
         else{
             System.out.println(partDate[0]+" "+partTime[0]+" ~ "+partDate[1]+" "+partTime[1]+" - "+title);
-            System.out.println("메모 : "+memo);
+            if(memo==null){
+                System.out.println("메모 : ");
+            }
+            else
+                System.out.println("메모 : "+memo);
         }
     }
 }

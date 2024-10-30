@@ -34,6 +34,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/jaeje/IdeaProjects/KUCalender",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -48,21 +49,6 @@
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\jaeje\IdeaProjects\Jeongip" />
     </key>
-  </component>
-  <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="KUCalender" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="KUCalender" />
-      <option name="filePath" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -89,6 +75,7 @@
       <workItem from="1728098441491" duration="17000" />
       <workItem from="1728221513114" duration="775000" />
       <workItem from="1730200090161" duration="18705000" />
+      <workItem from="1730270935408" duration="1925000" />
     </task>
     <servers />
   </component>

@@ -86,7 +86,7 @@ public class ScheduleManager {
     }
 
     public void ScheduleCheck() { //일정 확인
-        System.out.println("[일정]");
+
         Schedule selectSchedule;
 
         System.out.print("누구의 일정을 보시겠습니까? ID를 입력해 주세요.\n>>");
@@ -94,25 +94,22 @@ public class ScheduleManager {
         System.out.println("--------------------------------------------");
 
         if(ID.equals(Main.user.getID())||ID.trim().isEmpty()) { //사용자 ID
-            do{
-                selectSchedule = SelectSchedules(Main.user.getID());
-            }while (UpdateDeleteMenu(selectSchedule));
-
+            while((selectSchedule = SelectSchedules(Main.user.getID()))!=null){
+                UpdateDeleteMenu(selectSchedule);
+            }
         }
         else if(LoginSignup.getInstance().users.stream().filter(a->a.getID().equals(ID)).toList().isEmpty()){ //없는 ID
             System.out.println("ID가 존재하지 않습니다.");
             System.out.println("--------------------------------------------");
-            return;
         }
         else{
             while(SelectSchedules(ID)!=null){ //다른 사람 ID
                 System.out.println("--------------------------------------------");
-                System.out.println("Enter 키를 누르시면 일정 목록으로 돌아갑니다.");
+                System.out.print("Enter 키를 누르시면 일정 목록으로 돌아갑니다.");
                 Main.scan.nextLine();
                 System.out.println("--------------------------------------------");
             }
             System.out.println("--------------------------------------------");
-            return;
         }
     }
 
@@ -203,7 +200,7 @@ public class ScheduleManager {
             System.out.println("--------------------------------------------");
             return null;
         }
-
+        System.out.println("[일정]");
         System.out.println("<공개>");
         List<Schedule> publicSchedules = schedulesOfID.stream().filter(a->a.access==1).toList();
         for(Schedule schedule:publicSchedules) {
@@ -257,9 +254,9 @@ public class ScheduleManager {
     }
     //--------------------------------------------------------------------
 
-    public boolean UpdateDeleteMenu(Schedule selectSchedule) {
+    public void UpdateDeleteMenu(Schedule selectSchedule) {
         if(selectSchedule == null) {
-            return false;
+            return ;
         }
 
         System.out.println("[일정 수정 및 삭제]");
@@ -288,14 +285,14 @@ public class ScheduleManager {
 
             switch(input) {
                 case 1->{
-                    if(Update(selectSchedule))
-                        return false;
+                    if(!Update(selectSchedule))
+                        return ;
                 }
                 case 2->{
                     Delete(selectSchedule);
-                    return false;
+                    return ;
                 }
-                case 3->{return true;}
+                case 3->{return ;}
             }
         }
     }
@@ -304,9 +301,10 @@ public class ScheduleManager {
         while(true) {
             System.out.println("<수정 메뉴>");
             System.out.println("1.제목 수정");
-            System.out.println("2.시간 수정");
-            System.out.println("3.메모 수정");
-            System.out.println("4.돌아가기");
+            System.out.println("2.날짜 수정");
+            System.out.println("3.시간 수정");
+            System.out.println("4.메모 수정");
+            System.out.println("5.돌아가기");
             System.out.println("--------------------------------------------");
             System.out.print("메뉴를 선택해주세요\n>>");
 
@@ -318,7 +316,7 @@ public class ScheduleManager {
                 System.out.println("<오류: 올바른 메뉴를 선택해주세요>");
                 continue;
             }
-            if(input < 1 || input > 4) {
+            if(input < 1 || input > 5) {
                 System.out.println("<오류: 올바른 메뉴를 선택해주세요>");
                 continue;
             }
@@ -329,14 +327,18 @@ public class ScheduleManager {
                     return true;
                 }
                 case 2->{
-                    UpdateTime(schedule);
+                    UpdateDate(schedule);
                     return true;
                 }
                 case 3->{
+                    UpdateTime(schedule);
+                    return true;
+                }
+                case 4->{
                     UpdateMemo(schedule);
                     return true;
                 }
-                case 4->{return false;}
+                case 5->{return false;}
                 default->System.out.println("오류");
             }
         }
@@ -356,6 +358,25 @@ public class ScheduleManager {
             }
         }
         schedule.title = title;
+        System.out.println("--------------------------------------------");
+        System.out.println("일정 수정이 완료되었습니다");
+        System.out.println("--------------------------------------------");
+    }
+
+    private void UpdateDate(Schedule schedule) {
+        System.out.println("[날짜 수정]");
+        String date;
+        while(true) {
+            System.out.print("일정의 날짜를 입력하세요\n>>");
+            date = Main.scan.nextLine();
+            if(FileManager.getInstance().isValidDate(date)){
+                break;
+            }
+            else{
+                System.out.println("<오류:  올바른 형식이 아닙니다>");
+            }
+        }
+        schedule.date = date;
         System.out.println("--------------------------------------------");
         System.out.println("일정 수정이 완료되었습니다");
         System.out.println("--------------------------------------------");
