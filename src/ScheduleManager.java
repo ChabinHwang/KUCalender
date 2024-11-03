@@ -131,7 +131,7 @@ public class ScheduleManager {
         }
 
         while(true){
-            System.out.print("날짜를 입력하세요\n>>");
+            System.out.print("시작 날짜와 종료 날짜를 공백으로 구분하여 입력하세요. 예) 2024.10.31 2024.11.01\n>>");
             date = Main.scan.nextLine();
             if(FileManager.getInstance().isValidDate(date)){
                 String[] part = date.split(" ");
@@ -143,7 +143,7 @@ public class ScheduleManager {
             }
         }
         while(true){
-            System.out.print("시간을 입력하세요\n>>");
+            System.out.print("시작 시간과 종료 시간을 공백으로 구분하여 입력하세요. 예) 14:00 15:00\n>>");
             time = Main.scan.nextLine();
             if(FileManager.getInstance().isValidTime(time,oneDay)){
                 break;
@@ -228,13 +228,15 @@ public class ScheduleManager {
         System.out.println("--------------------------------------------");
 
         while(true){
+
             System.out.print("세부사항을 확인할 일정을 골라주세요. 돌아가려면 0번을 입력해 주세요.\n>>");
 
             //입력 예외처리
             try {
                 selectSchedule = Integer.parseInt(Main.scan.nextLine());
             }catch(Exception e) {
-                System.out.println("<오류:잘못된 입력입니다.>");
+
+                System.out.println("<오류:올바른 형식이 아닙니다>");
                 continue;
             }
 
@@ -242,7 +244,8 @@ public class ScheduleManager {
             if(selectSchedule==0)
                 return null;
             else if(((selectSchedule < 1 || selectSchedule > schedulesOfID.size())&& !privateSchedules.isEmpty())||((selectSchedule < 1 || selectSchedule > publicSchedules.size())&&privateSchedules.isEmpty() )) {
-                System.out.println("<오류:잘못된 입력입니다.>");
+
+                System.out.println("<오류:올바른 형식이 아닙니다>");
                 continue;
             }
 
@@ -254,6 +257,7 @@ public class ScheduleManager {
         System.out.println("--------------------------------------------");
         Schedule s = selectSchedule<=publicSchedules.size()-1?publicSchedules.get(selectSchedule):privateSchedules.get(selectSchedule-publicSchedules.size());
         s.printScheduleAddMemo();
+        System.out.println("--------------------------------------------");
         return s;
     }
     //--------------------------------------------------------------------
@@ -263,7 +267,6 @@ public class ScheduleManager {
             return ;
         }
 
-        System.out.println("[일정 수정 및 삭제]");
 
         //삭제 및 수정 메뉴
         while(true) {
@@ -279,11 +282,11 @@ public class ScheduleManager {
             try {
                 input = Integer.parseInt(Main.scan.nextLine());
             }catch(Exception e) {
-                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                System.out.println("<오류:올바른 형식이 아닙니다>");
                 continue;
             }
             if(input < 1 || input > 3) {
-                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                System.out.println("<오류:올바른 형식이 아닙니다>");
                 continue;
             }
 
@@ -302,6 +305,7 @@ public class ScheduleManager {
     }
 
     public boolean Update(Schedule schedule) {
+
         while(true) {
             System.out.println("<수정 메뉴>");
             System.out.println("1.제목 수정");
@@ -317,29 +321,37 @@ public class ScheduleManager {
             try {
                 input = Integer.parseInt(Main.scan.nextLine());
             }catch(Exception e) {
-                System.out.println("<오류: 올바른 메뉴를 선택해주세요>");
+                System.out.println("<오류:올바른 형식이 아닙니다.>");
                 continue;
             }
             if(input < 1 || input > 5) {
-                System.out.println("<오류: 올바른 메뉴를 선택해주세요>");
+                System.out.println("<오류:올바른 형식이 아닙니다.>");
                 continue;
             }
 
             switch(input) {
                 case 1->{
                     UpdateTitle(schedule);
+                    schedule.printScheduleAddMemo();
+                    System.out.println("--------------------------------------------");
                     return true;
                 }
                 case 2->{
                     UpdateDate(schedule);
+                    schedule.printScheduleAddMemo();
+                    System.out.println("--------------------------------------------");
                     return true;
                 }
                 case 3->{
                     UpdateTime(schedule);
+                    schedule.printScheduleAddMemo();
+                    System.out.println("--------------------------------------------");
                     return true;
                 }
                 case 4->{
                     UpdateMemo(schedule);
+                    schedule.printScheduleAddMemo();
+                    System.out.println("--------------------------------------------");
                     return true;
                 }
                 case 5->{return false;}
@@ -371,12 +383,13 @@ public class ScheduleManager {
         System.out.println("[날짜 수정]");
         String date;
         while(true) {
-            System.out.print("일정의 날짜를 입력하세요\n>>");
+            System.out.print("시작 날짜와 종료 날짜를 공백으로 구분하여 입력하세요. 예) 2024.10.31 2024.11.01\n>>");
             date = Main.scan.nextLine();
             if(FileManager.getInstance().isValidDate(date)){
                 break;
             }
             else{
+
                 System.out.println("<오류:  올바른 형식이 아닙니다>");
             }
         }
@@ -394,7 +407,7 @@ public class ScheduleManager {
         oneDay = part[0].equals(part[1]);
 
         while(true) {
-            System.out.print("일정의 시간을 입력하세요\n>>");
+            System.out.print("시작 시간과 종료 시간을 공백으로 구분하여 입력하세요. 예) 14:00 16:00\n>>");
             time = Main.scan.nextLine();
             if(FileManager.getInstance().isValidTime(time,oneDay)){
                 break;
