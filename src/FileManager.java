@@ -8,41 +8,6 @@ import java.time.format.DateTimeFormatter;
 public class FileManager {
     static FileManager Fm;
 
-    //있으면 안됨(중복)
-    /*private FileManager() {
-        try{
-            File file = new File("schedule.txt");
-
-            if (file.exists()) {
-                BufferedReader reader = new BufferedReader(new FileReader(file));
-                String line;
-
-                // 파일의 각 줄을 읽고 스케줄 객체로 변환
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split("\t");
-
-                    Schedule schedule = null;
-
-                    //memo가 없으면 parts의 길이 : 5
-                    if (parts.length == 5) {
-                        schedule = new Schedule(parts[0], parts[1], parts[2], parts[3], Integer.parseInt(parts[4]),null);
-                    } else if (parts.length == 6) {
-                        schedule = new Schedule(parts[0], parts[1], parts[2], parts[3], Integer.parseInt(parts[4]),parts[5]);
-                    }
-
-                    // ScheduleManager의 schedules 리스트에 추가
-                    if (schedule != null) {
-                        ScheduleManager.getInstance().schedules.add(schedule);
-                    }
-
-                }
-                reader.close();
-            }
-        } catch (IOException e){
-            System.err.println("데이터베이스에 문제가 있습니다.");
-        }
-    }*/
-
     public static FileManager getInstance() {
         if (Fm == null) {
             Fm = new FileManager();
@@ -56,13 +21,13 @@ public class FileManager {
         int PWLength = PW.length();
 
         // ID에 공백이 있는지 확인
-        if (ID.contains(" ")) {
+        if (ID.contains(" ")||ID.contains("\t")) {
             System.out.println("ID는 공백을 포함할 수 없습니다.");
             return false;
         }
 
         // PW에 공백이 있는지 확인
-        if (PW.contains(" ")) {
+        if (PW.contains(" ")||PW.contains("\t")) {
             System.out.println("PW는 공백을 포함할 수 없습니다.");
             return false;
         }
@@ -82,7 +47,7 @@ public class FileManager {
 
     public boolean isValidTitle(String title) {
         if (title == null) return false;
-
+        if(title.contains("\t")) return false;
         int len = title.length();
         return len <= 20 && len >= 1;
     }
@@ -236,7 +201,7 @@ public class FileManager {
 
     public boolean isValidMemo(String memo) {
         if (memo == null) return false;
-
+        if(memo.contains("\t")) return false;
         int len = memo.length();
         return len<= 100;
     }
@@ -244,4 +209,5 @@ public class FileManager {
     public boolean isValidAccess(int access) {
         return access >= 1 && access <= 2;
     }
+
 }
