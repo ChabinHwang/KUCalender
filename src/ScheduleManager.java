@@ -382,9 +382,25 @@ public class ScheduleManager {
     private void UpdateDate(Schedule schedule) {
         System.out.println("[날짜 수정]");
         String date;
+
         while(true) {
             System.out.print("시작 날짜와 종료 날짜를 공백으로 구분하여 입력하세요. 예) 2024.10.31 2024.11.01\n>>");
             date = Main.scan.nextLine();
+
+            String[] s = date.split(" ");
+            if(s[0].equals(s[1]))
+            {
+                String[] part = schedule.time.split(" ");
+
+                String start = part[0];
+                String end = part[1];
+
+                if (start.compareTo(end) >= 0) {
+                    System.out.println("<오류: 날짜가 하루로 수정하려면 시작 시간이 종료 시간보다 앞서야 합니다>");
+                    continue;
+                }
+            }
+
             if(FileManager.getInstance().isValidDate(date)){
                 break;
             }

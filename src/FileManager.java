@@ -48,6 +48,8 @@ public class FileManager {
     public boolean isValidTitle(String title) {
         if (title == null) return false;
         if(title.contains("\t")) return false;
+        if(title.matches("^\\s.*")) return false;
+        if(title.trim().isEmpty()) return false;
         int len = title.length();
         return len <= 20 && len >= 1;
     }
