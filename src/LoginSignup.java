@@ -94,13 +94,6 @@ public class LoginSignup {
             ///입력
             System.out.print("ID:");
             id = Main.scan.nextLine();
-            System.out.print("PW:");
-            pw = Main.scan.nextLine();
-
-            //조건 검사
-            if(!FileManager.getInstance().isValidIDPW(id,pw)){
-                continue Loop;
-            }
 
             for(User user:users) {
                 if(id.equals(user.getID())){
@@ -109,6 +102,13 @@ public class LoginSignup {
                 }
             }
 
+            System.out.print("PW:");
+            pw = Main.scan.nextLine();
+
+            //조건 검사
+            if(!FileManager.getInstance().isValidIDPW(id,pw)){
+                continue;
+            }
             break;
         }
 

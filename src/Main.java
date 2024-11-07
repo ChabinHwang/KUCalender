@@ -63,11 +63,11 @@ public class Main {
             try {
                 input = Integer.parseInt(scan.nextLine());
             }catch(Exception e) {
-                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                System.out.println("<오류: 숫자를 입력해주세요>");
                 continue;
             }
             if(input < 1 || input > 4) {
-                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                System.out.println("<오류: 올바른 번호를 입력해주세요>");
                 continue;
             }
 
