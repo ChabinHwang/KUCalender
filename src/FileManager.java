@@ -131,17 +131,17 @@ public class FileManager {
 
             if (monthWith30Days) {
                 if (DAY > 30) {
-                    System.out.println("<오류: 해당 달은 30일까지만 있습니다> ");
+                    System.out.println("<오류: 4,6,9,11월 은 30일까지만 있습니다> ");
                     return false;
                 }
             } else if (monthWith28Days) {
                 if (DAY > 28) {
-                    System.out.println("<오류: 해당 달은 28일까지만 있습니다> ");
+                    System.out.println("<오류: 윤년이 아닌 년도의 2월은 28일까지만 있습니다> ");
                     return false;
                 }
             } else if (monthWith29Days) {
                 if (DAY > 29) {
-                    System.out.println("<오류: 해당 달은 29일까지만 있습니다> ");
+                    System.out.println("<오류: 윤년인 년도의 2월은 29일까지만 있습니다> ");
                     return false;
                 }
             }

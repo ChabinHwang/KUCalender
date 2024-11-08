@@ -67,7 +67,7 @@ public class Main {
                 continue;
             }
             if(input < 1 || input > 4) {
-                System.out.println("<오류: 올바른 번호를 입력해주세요>");
+                System.out.println("<오류: 올바른 메뉴를 선택해주세요>");
                 continue;
             }
 

@@ -270,11 +270,11 @@ public class ScheduleManager {
             try {
                 input = Integer.parseInt(Main.scan.nextLine());
             }catch(Exception e) {
-                System.out.println("<오류: 인덱스 범위 내의 정수를 입력하세요>");
+                System.out.println("<오류: 숫자를 입력해주세요>");
                 continue;
             }
             if(input < 1 || input > 3) {
-                System.out.println("<오류: 인덱스 범위 내의 정수를 입력하세요>");
+                System.out.println("<오류: 올바른 메뉴를 선택해주세요>");
                 continue;
             }
 
@@ -372,6 +372,10 @@ public class ScheduleManager {
             System.out.print("시작 날짜와 종료 날짜를 공백으로 구분하여 입력하세요. 예) 2024.10.31 2024.11.01\n>>");
             date = Main.scan.nextLine();
 
+            if(!(FileManager.getInstance().isValidDate(date))){
+                continue;
+            }
+
             String[] s = date.split(" ");
             if(s[0].equals(s[1]))
             {
@@ -385,10 +389,7 @@ public class ScheduleManager {
                     continue;
                 }
             }
-
-            if(FileManager.getInstance().isValidDate(date)){
-                break;
-            }
+            break;
         }
         schedule.date = date;
         System.out.println("--------------------------------------------");
@@ -400,7 +401,7 @@ public class ScheduleManager {
         System.out.println("[시간 수정]");
         String time;
         boolean oneDay;
-        String[] part = schedule.time.split(" ");
+        String[] part = schedule.date.split(" ");
         oneDay = part[0].equals(part[1]);
 
         while(true) {
