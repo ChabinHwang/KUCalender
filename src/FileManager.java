@@ -2,8 +2,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 
 public class FileManager {
     static FileManager Fm;
@@ -70,7 +73,7 @@ public class FileManager {
     public boolean isValidDate(String date) {
         if (date == null) return false;
 
-        String regex = "^\\d{4}([./_-])\\d{2}\\1\\d{2} \\d{4}([./_-])\\d{2}\\1\\d{2}$"; //공백도 구분자임
+        String regex = "^\\d{4}([./_-])\\d{2}\\1\\d{2} \\d{4}\\1\\d{2}\\1\\d{2}$"; //공백도 구분자임
 
         if (!date.matches(regex)) {
             System.out.println("<오류: 날짜는 YYYY.MM.DD YYYY.MM.DD 형식이어야 합니다(구분자는 온점(.), 하이픈(-), 슬래시(/), 언더바(_) 가능)> ");
@@ -167,6 +170,22 @@ public class FileManager {
         return !parsedDate1.isAfter(parsedDate2);
     }
 
+    public static boolean isLater(String date1, String date2) {
+
+        if(date2.matches("^0000([./_-])00\\100 0000\\100\\100$"))
+            return true;
+
+        // 날짜 형식 정의
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+
+        // 문자열을 LocalDate로 변환
+        LocalDate parsedDate1 = LocalDate.parse(date1, formatter);
+        LocalDate parsedDate2 = LocalDate.parse(date2, formatter);
+
+        // 같은 날짜이거나 두 번째 날짜가 더 나중인지 확인
+        return parsedDate2.isAfter(parsedDate1);
+    }
+
     public boolean isValidTime(String time,boolean oneDay) {
         if (time == null) return false;
 
@@ -234,6 +253,106 @@ public class FileManager {
 
     public boolean isValidAccess(int access) {
         return access >= 1 && access <= 2;
+    }
+
+
+
+    public boolean isValidBusy(int busy) {
+        return busy >= 0 && busy <= 1;
+    }
+
+    public boolean isValidCycleType(int cycleType) {
+        return cycleType >= -2 && cycleType <= 0;
+    }
+
+    public boolean isValidCycleHaltDate(String cycleHaltDate) {
+        //여기
+        return true;
+    }
+
+    //요일(날짜)
+    public static String getDayOfWeek(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            LocalDate date = LocalDate.parse(dateString, formatter);
+            DayOfWeek dayOfWeek = date.getDayOfWeek();
+            return switch (dayOfWeek) {
+                case MONDAY -> "월";
+                case TUESDAY -> "화";
+                case WEDNESDAY -> "수";
+                case THURSDAY -> "목";
+                case FRIDAY -> "금";
+                case SATURDAY -> "토";
+                case SUNDAY -> "일";
+            }; // 한글 요일로 변환
+        } catch (DateTimeParseException e) {
+            return "잘못된 날짜 형식입니다. yyyy-MM-dd 형식으로 입력하세요.";
+        }
+    }
+
+    //일 = 날짜-날짜
+    public static int calculateDateDifference(String startDateString, String endDateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            LocalDate startDate = LocalDate.parse(startDateString, formatter);
+            LocalDate endDate = LocalDate.parse(endDateString, formatter);
+            return (int) java.time.temporal.ChronoUnit.DAYS.between(startDate, endDate);
+        } catch (DateTimeParseException e) {
+            System.out.println("잘못된 날짜 형식입니다. yyyy-MM-dd 형식으로 입력하세요.");
+            return -1; // 오류 발생 시 0 반환
+        }
+    }
+    //날짜 = 날짜 + 일
+    public static LocalDate addDaysToDate(String startDateString, int daysToAdd) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            LocalDate startDate = LocalDate.parse(startDateString, formatter);
+            return startDate.plusDays(daysToAdd);
+        } catch (DateTimeParseException e) {
+            System.out.println("잘못된 날짜 형식입니다. yyyy-MM-dd 형식으로 입력하세요.");
+            return null; // 오류 발생 시 null 반환
+        }
+    }
+
+    //일 뽑기
+    public static int getDayOfYear(String dateString) {
+        try {
+            // 날짜 문자열을 LocalDate 객체로 변환
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate date = LocalDate.parse(dateString, formatter);
+            // 연중 몇 번째 날인지 계산
+            return date.getDayOfYear();
+        } catch (DateTimeParseException e) {
+            System.out.println("잘못된 날짜 형식입니다. yyyy-MM-dd 형식으로 입력하세요.");
+            return -1; // 오류를 나타내기 위해 -1 반환
+        }
+    }
+
+    //겹치는거 확인하는 메소드
+    public static boolean isOverlapping(String start1, String end1, String start2, String end2) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+
+        try {
+            LocalDate startDate1 = LocalDate.parse(start1, formatter);
+            LocalDate endDate1 = LocalDate.parse(end1, formatter);
+            LocalDate startDate2 = LocalDate.parse(start2, formatter);
+            LocalDate endDate2 = LocalDate.parse(end2, formatter);
+
+            // 두 날짜 범위가 겹치는지 확인
+            return (startDate1.isBefore(endDate2) && endDate1.isAfter(startDate2));
+        } catch (DateTimeParseException e) {
+            System.out.println("잘못된 날짜 형식입니다. YYYY.MM.DD 형식으로 입력하세요.");
+            return false; // 오류 발생 시 false 반환
+        }
+    }
+
+    public static boolean checkOverlap(Schedule checkSchedule, ArrayList<Schedule> schedules) {
+        for (Schedule schedule : schedules) {
+            if(schedule.cycleType!=0){
+                //여기
+            }
+        }
+        return false;
     }
 
 }

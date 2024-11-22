@@ -39,10 +39,10 @@ public class ScheduleManager {
                 String[] part = line.split("\t");
 
                 // 데이터를 스케줄에 추가
-                if(part.length==5){
-                    schedules.add(new Schedule(part[0], part[1], part[2], part[3], Integer.parseInt(part[4]), null));
+                if(part.length==8){
+                    schedules.add(new Schedule(part[0], part[1], part[2], part[3], Integer.parseInt(part[4]),Integer.parseInt(part[5]), Integer.parseInt(part[6]),part[7],null));
                 }else{
-                    schedules.add(new Schedule(part[0], part[1], part[2], part[3], Integer.parseInt(part[4]), part[5]));
+                    schedules.add(new Schedule(part[0], part[1], part[2], part[3], Integer.parseInt(part[4]),Integer.parseInt(part[5]),Integer.parseInt(part[6]),part[7], part[8]));
                 }
 
             }
@@ -60,11 +60,13 @@ public class ScheduleManager {
             for(Schedule schedule:schedules) {
                 if(schedule.memo==null){
                     writeFile.println(schedule.ID + "\t" + schedule.title + "\t" + schedule.date
-                            + "\t" + schedule.time + "\t"+ schedule.access + "\t" );
+                            + "\t" + schedule.time + "\t"+ schedule.access + "\t" + schedule.busy
+                            +  "\t" + schedule.cycleType + "\t" + schedule.cycleHaltDate +"\t");
                 }
                 else{
                     writeFile.println(schedule.ID + "\t" + schedule.title + "\t" + schedule.date
-                            + "\t" + schedule.time + "\t"+ schedule.access + "\t" + schedule.memo);
+                            + "\t" + schedule.time + "\t"+ schedule.access + "\t" + schedule.busy
+                            +  "\t" + schedule.cycleType + "\t" + schedule.cycleHaltDate +"\t" + schedule.memo);
                 }
             }
             writeFile.close();
@@ -80,6 +82,18 @@ public class ScheduleManager {
         for(Schedule schedule:schedules) {
             if(schedule.ID.equals(ID)) {
                 schedulesOfID.add(schedule);
+            }
+        }
+        return schedulesOfID;
+    }
+    private ArrayList<Schedule> getSchedulesOfID(String ID,ArrayList<Schedule> busySchedules) {
+        ArrayList<Schedule> schedulesOfID = new ArrayList<>();
+        for(Schedule schedule:schedules) {
+            if(schedule.ID.equals(ID)) {
+                schedulesOfID.add(schedule);
+            }
+            if(schedule.busy==1){
+                busySchedules.add(schedule);
             }
         }
         return schedulesOfID;
@@ -115,9 +129,11 @@ public class ScheduleManager {
 
     public void AddSchedule() { //일정 등록
         System.out.println("[일정 등록]");
-        String title, date, time, memo;
-        int access;
+        String title, date, time, memo, cycleHaltDate;
+        int access, busy, cycleType;
         boolean oneDay;
+        ArrayList<Schedule> busySchedulesOfID=new ArrayList<>();
+        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(Main.user.getID(),busySchedulesOfID);
 
         while(true){
             System.out.print("일정의 제목을 입력하세요\n>>");
@@ -126,12 +142,12 @@ public class ScheduleManager {
                 break;
             }
         }
-
+        String[] part;
         while(true){
             System.out.print("시작 날짜와 종료 날짜를 공백으로 구분하여 입력하세요. 예) 2024.10.31 2024.11.01\n>>");
             date = Main.scan.nextLine();
             if(FileManager.getInstance().isValidDate(date)){
-                String[] part = date.split(" ");
+                part = date.split(" ");
                 oneDay = part[0].equals(part[1]);
                 break;
             }
@@ -143,6 +159,7 @@ public class ScheduleManager {
                 break;
             }
         }
+
         while(true){
             System.out.print("메모을 입력하세요\n>>");
             memo = Main.scan.nextLine();
@@ -151,7 +168,6 @@ public class ScheduleManager {
             }
         }
 
-        //-----------------------------공개 여부(추가)--------------------------
         while(true){
             System.out.print("공개여부을 입력하세요(1: 공개/2: 비공개)\n>>");
 
@@ -170,9 +186,62 @@ public class ScheduleManager {
             }
         }
 
+        while(true) {
+            System.out.print("반복여부와 반복종료일을 입력하세요(0:반복안함/1 2024.10.11:2024.10.11 까지 매주반복/2 2024.10.11:2024.10.11 까지 매달반복)\n>>");
+            String input = Main.scan.nextLine();
+            if (!input.matches("^\\d \\d{4}([./_-])\\d{2}\\1\\d{2}$") || !input.matches("^\\d$")) {
+                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                continue;
+            }
+
+            String[] inputs = input.split(" ");
+            cycleType = -Integer.parseInt(inputs[0]);
+            if (cycleType == 0) {
+                cycleHaltDate = "0000.00.00";
+            } else
+                cycleHaltDate = inputs[1];
+
+            if (!FileManager.getInstance().isValidCycleType(cycleType)) {
+                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                continue;
+            }
+
+            if (!FileManager.getInstance().isValidCycleHaltDate(cycleHaltDate)) {
+                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                continue;
+            }
+            if(!FileManager.isLater(part[1],cycleHaltDate)){
+                System.out.println("<오류: 반복종료일은 첫 번째 반복일정의 종료일보다 나중이어야 합니다>");
+                continue;
+            }
+            break;
+        }
+        while(true) {
+            System.out.print("바쁨여부을 입력하세요(0: 안바쁨/1: 바쁨)\n>>");
+
+            try {
+                busy = Integer.parseInt(Main.scan.nextLine());
+            } catch (Exception e) {
+                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                continue;
+            }
+
+            if (!FileManager.getInstance().isValidBusy(busy)) {
+                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                continue;
+            }
+            break;
+        }
+        Schedule addSchedule = new Schedule(Main.user.getID(),title,date,time,access,busy,cycleType,cycleHaltDate,memo);
+
+        //겹치는지 확인
+        if(FileManager.checkOverlap(addSchedule,schedulesOfID)){
+            System.out.println("<오류: 바쁜일정과 다른 일정은 겹칠 수 없습니다>");
+            return;
+        }
 
         //일정 등록
-        schedules.add(new Schedule(Main.user.getID(),title,date,time,access,memo));
+        schedules.add(addSchedule);
 
         System.out.println("--------------------------------------------");
         System.out.println("일정 등록이 완료되었습니다");
@@ -184,7 +253,8 @@ public class ScheduleManager {
     public Schedule SelectSchedules(String ID){
         int n = 1;
         int selectSchedule;
-        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(ID);//사용자의 스케줄 List
+        ArrayList<Schedule> busySchedulesOfID = new ArrayList<>();
+        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(ID,busySchedulesOfID);//사용자의 스케줄 List
         System.out.println("[일정]");
 
         if(schedulesOfID.isEmpty()) {
@@ -202,6 +272,7 @@ public class ScheduleManager {
         }
 
         List<Schedule> privateSchedules = new ArrayList<>();
+        List<Schedule> busyPrivateSchedules = new ArrayList<>();
 
         if(Main.user.getID().equals(ID)){
             System.out.println("<비공개>");
@@ -210,6 +281,13 @@ public class ScheduleManager {
                 System.out.print(n+".");
                 schedule.printSchedule();
                 n++;
+            }
+        }
+        else if(!busySchedulesOfID.isEmpty()){
+            System.out.println("<비공개>");
+            busyPrivateSchedules = busySchedulesOfID.stream().filter(a->a.access==2).toList();
+            for(Schedule schedule:busyPrivateSchedules) {
+                schedule.printScheduleBusyPriavte();
             }
         }
 
@@ -300,7 +378,10 @@ public class ScheduleManager {
             System.out.println("2.날짜 수정");
             System.out.println("3.시간 수정");
             System.out.println("4.메모 수정");
-            System.out.println("5.돌아가기");
+            System.out.println("5.메모 수정");
+            System.out.println("6.메모 수정");
+            System.out.println("7.메모 수정");
+            System.out.println("8.돌아가기");
             System.out.println("--------------------------------------------");
             System.out.print("메뉴를 선택해주세요\n>>");
 
@@ -312,7 +393,7 @@ public class ScheduleManager {
                 System.out.println("<오류: 숫자를 입력해주세요>");
                 continue;
             }
-            if(input < 1 || input > 5) {
+            if(input < 1 || input > 8) {
                 System.out.println("<오류: 올바른 메뉴를 선택해주세요>");
                 continue;
             }
@@ -342,7 +423,25 @@ public class ScheduleManager {
                     System.out.println("--------------------------------------------");
                     return true;
                 }
-                case 5->{return false;}
+                case 5->{
+                    UpdateAccess(schedule);
+                    schedule.printScheduleAddMemo();
+                    System.out.println("--------------------------------------------");
+                    return true;
+                }
+                case 6->{
+                    UpdateCycle(schedule);
+                    schedule.printScheduleAddMemo();
+                    System.out.println("--------------------------------------------");
+                    return true;
+                }
+                case 7->{
+                    UpdateBusy(schedule);
+                    schedule.printScheduleAddMemo();
+                    System.out.println("--------------------------------------------");
+                    return true;
+                }
+                case 8->{return false;}
                 default->System.out.println("오류");
             }
         }
@@ -389,7 +488,31 @@ public class ScheduleManager {
                     continue;
                 }
             }
+            if(!FileManager.isLater(s[1],schedule.cycleHaltDate)){
+                System.out.println("<오류: 반복종료일은 첫 번째 반복일정의 종료일보다 나중이어야 합니다>");
+                continue;
+            }
             break;
+        }
+        ArrayList<Schedule> busySchedulesOfID = new ArrayList<>();
+        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(Main.user.getID(),busySchedulesOfID);
+        if(schedule.busy==1) {
+            if (FileManager.checkOverlap(new Schedule(
+                            schedule.ID, schedule.title, date, schedule.time, schedule.access, schedule.busy, schedule.cycleType, schedule.cycleHaltDate, schedule.memo),
+                    schedulesOfID))
+            {
+                System.out.println("<오류: 바쁜일정과 다른 일정은 겹칠 수 없습니다>");
+                return;
+            }
+        }
+        else{
+            if (FileManager.checkOverlap(new Schedule(
+                            schedule.ID, schedule.title, date, schedule.time, schedule.access, schedule.busy, schedule.cycleType, schedule.cycleHaltDate, schedule.memo),
+                    busySchedulesOfID
+            )) {
+                System.out.println("<오류: 바쁜일정과 다른 일정은 겹칠 수 없습니다>");
+                return;
+            }
         }
         schedule.date = date;
         System.out.println("--------------------------------------------");
@@ -411,6 +534,26 @@ public class ScheduleManager {
                 break;
             }
         }
+        ArrayList<Schedule> busySchedulesOfID = new ArrayList<>();
+        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(Main.user.getID(),busySchedulesOfID);
+        if(schedule.busy==1) {
+            if (FileManager.checkOverlap(new Schedule(
+                            schedule.ID, schedule.title, schedule.date, time, schedule.access, schedule.busy, schedule.cycleType, schedule.cycleHaltDate, schedule.memo),
+                    schedulesOfID))
+            {
+                System.out.println("<오류: 바쁜일정과 다른 일정은 겹칠 수 없습니다>");
+                return;
+            }
+        }
+        else{
+            if (FileManager.checkOverlap(new Schedule(
+                            schedule.ID, schedule.title, schedule.date, time, schedule.access, schedule.busy, schedule.cycleType, schedule.cycleHaltDate, schedule.memo),
+                    busySchedulesOfID
+            )) {
+                System.out.println("<오류: 바쁜일정과 다른 일정은 겹칠 수 없습니다>");
+                return;
+            }
+        }
         schedule.time = time;
         System.out.println("--------------------------------------------");
         System.out.println("일정 수정이 완료되었습니다");
@@ -428,6 +571,137 @@ public class ScheduleManager {
             }
         }
         schedule.memo = memo;
+        System.out.println("--------------------------------------------");
+        System.out.println("일정 수정이 완료되었습니다");
+        System.out.println("--------------------------------------------");
+    }
+
+    private void UpdateAccess(Schedule schedule) {
+        System.out.println("[공개여부 수정]");
+        int access;
+        while(true) {
+            System.out.print("공개여부을 입력하세요(1: 공개/2: 비공개)\n>>");
+            try {
+                access = Integer.parseInt(Main.scan.nextLine());
+            }catch(Exception e) {
+                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                continue;
+            }
+
+            if(!FileManager.getInstance().isValidAccess(access)){
+                System.out.println("<오류: 올바른 형식이 아닙니다>");
+            }
+            else{
+                break;
+            }
+        }
+        schedule.access = access;
+        System.out.println("--------------------------------------------");
+        System.out.println("일정 수정이 완료되었습니다");
+        System.out.println("--------------------------------------------");
+    }
+
+    private void UpdateCycle(Schedule schedule) {
+        System.out.println("[반복 수정]");
+        String cycleHaltDate;
+        int cycleType;
+        while(true) {
+            System.out.print("반복여부와 반복종료일을 입력하세요(0:반복안함/1 2024.10.11:2024.10.11 까지 매주반복/2 2024.10.11:2024.10.11 까지 매달반복)\n>>");
+            String input = Main.scan.nextLine();
+            if (!input.matches("^\\d \\d{4}([./_-])\\d{2}\\1\\d{2}$") || !input.matches("^\\d$")) {
+                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                continue;
+            }
+
+            String[] inputs = input.split(" ");
+            cycleType = -Integer.parseInt(inputs[0]);
+            if (cycleType == 0) {
+                cycleHaltDate = "0000.00.00";
+            } else
+                cycleHaltDate = inputs[1];
+
+            if (!FileManager.getInstance().isValidCycleType(cycleType)) {
+                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                continue;
+            }
+
+            if (!FileManager.getInstance().isValidCycleHaltDate(cycleHaltDate)) {
+                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                continue;
+            }
+            if(!FileManager.isLater(schedule.date.split(" ")[1],cycleHaltDate)){
+                System.out.println("<오류: 반복종료일은 첫 번째 반복일정의 종료일보다 나중이어야 합니다>");
+                continue;
+            }
+            break;
+        }
+        ArrayList<Schedule> busySchedulesOfID = new ArrayList<>();
+        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(Main.user.getID(),busySchedulesOfID);
+        if(schedule.busy==1) {
+            if (FileManager.checkOverlap(new Schedule(
+                    schedule.ID, schedule.title, schedule.date, schedule.time, schedule.access, schedule.busy, cycleType, cycleHaltDate, schedule.memo),
+                    schedulesOfID))
+            {
+                System.out.println("<오류: 바쁜일정과 다른 일정은 겹칠 수 없습니다>");
+                return;
+            }
+        }
+        else{
+            if (FileManager.checkOverlap(new Schedule(
+                    schedule.ID, schedule.title, schedule.date, schedule.time, schedule.access, schedule.busy, cycleType, cycleHaltDate, schedule.memo),
+                    busySchedulesOfID
+            )) {
+                System.out.println("<오류: 바쁜일정과 다른 일정은 겹칠 수 없습니다>");
+                return;
+            }
+        }
+        schedule.cycleType = cycleType;
+        schedule.cycleHaltDate = cycleHaltDate;
+        System.out.println("--------------------------------------------");
+        System.out.println("일정 수정이 완료되었습니다");
+        System.out.println("--------------------------------------------");
+    }
+
+    private void UpdateBusy(Schedule schedule) {
+        System.out.println("[바쁨 수정]");
+        int busy;
+        while(true) {
+            System.out.print("바쁨여부을 입력하세요(0: 안바쁨/1: 바쁨)\n>>");
+
+            try {
+                busy = Integer.parseInt(Main.scan.nextLine());
+            } catch (Exception e) {
+                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                continue;
+            }
+
+            if (!FileManager.getInstance().isValidBusy(busy)) {
+                System.out.println("<오류: 올바른 형식이 아닙니다>");
+                continue;
+            }
+            break;
+        }
+        ArrayList<Schedule> busySchedulesOfID = new ArrayList<>();
+        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(Main.user.getID(),busySchedulesOfID);
+        if(busy==1) {
+            if (FileManager.checkOverlap(new Schedule(
+                            schedule.ID, schedule.title, schedule.date, schedule.time, schedule.access, busy, schedule.cycleType, schedule.cycleHaltDate, schedule.memo),
+                    schedulesOfID))
+            {
+                System.out.println("<오류: 바쁜일정과 다른 일정은 겹칠 수 없습니다>");
+                return;
+            }
+        }
+        else{
+            if (FileManager.checkOverlap(new Schedule(
+                            schedule.ID, schedule.title, schedule.date, schedule.time, schedule.access, busy, schedule.cycleType, schedule.cycleHaltDate, schedule.memo),
+                    busySchedulesOfID
+            )) {
+                System.out.println("<오류: 바쁜일정과 다른 일정은 겹칠 수 없습니다>");
+                return;
+            }
+        }
+        schedule.busy = busy;
         System.out.println("--------------------------------------------");
         System.out.println("일정 수정이 완료되었습니다");
         System.out.println("--------------------------------------------");
