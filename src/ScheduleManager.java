@@ -92,7 +92,20 @@ public class ScheduleManager {
             if(schedule.ID.equals(ID)) {
                 schedulesOfID.add(schedule);
             }
-            if(schedule.busy==1){
+            if(schedule.ID.equals(ID)&&schedule.busy==1){
+                busySchedules.add(schedule);
+            }
+        }
+        return schedulesOfID;
+    }
+    
+    private ArrayList<Schedule> getSchedulesOfID(String ID,ArrayList<Schedule> busySchedules,Schedule except) {
+        ArrayList<Schedule> schedulesOfID = new ArrayList<>();
+        for(Schedule schedule:schedules) {
+            if(schedule.ID.equals(ID)&&!schedule.equals(except)) {
+                schedulesOfID.add(schedule);
+            }
+            if(schedule.ID.equals(ID)&&schedule.busy==1&&!schedule.equals(except)){
                 busySchedules.add(schedule);
             }
         }
@@ -505,8 +518,10 @@ public class ScheduleManager {
             break;
         }
         ArrayList<Schedule> busySchedulesOfID = new ArrayList<>();
-        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(Main.user.getID(),busySchedulesOfID);
+        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(Main.user.getID(),busySchedulesOfID,schedule);
+        
         if(schedule.busy==1) {
+        	
             if (FileManager.checkOverlap(new Schedule(
                             schedule.ID, schedule.title, date, schedule.time, schedule.access, schedule.busy, schedule.cycleType, schedule.cycleHaltDate, schedule.memo),
                     schedulesOfID))
@@ -545,7 +560,7 @@ public class ScheduleManager {
             }
         }
         ArrayList<Schedule> busySchedulesOfID = new ArrayList<>();
-        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(Main.user.getID(),busySchedulesOfID);
+        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(Main.user.getID(),busySchedulesOfID,schedule);
         if(schedule.busy==1) {
             if (FileManager.checkOverlap(new Schedule(
                             schedule.ID, schedule.title, schedule.date, time, schedule.access, schedule.busy, schedule.cycleType, schedule.cycleHaltDate, schedule.memo),
@@ -647,7 +662,7 @@ public class ScheduleManager {
             break;
         }
         ArrayList<Schedule> busySchedulesOfID = new ArrayList<>();
-        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(Main.user.getID(),busySchedulesOfID);
+        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(Main.user.getID(),busySchedulesOfID,schedule);
         if(schedule.busy==1) {
             if (FileManager.checkOverlap(new Schedule(
                     schedule.ID, schedule.title, schedule.date, schedule.time, schedule.access, schedule.busy, cycleType, cycleHaltDate, schedule.memo),
@@ -693,7 +708,7 @@ public class ScheduleManager {
             break;
         }
         ArrayList<Schedule> busySchedulesOfID = new ArrayList<>();
-        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(Main.user.getID(),busySchedulesOfID);
+        ArrayList<Schedule> schedulesOfID = getSchedulesOfID(Main.user.getID(),busySchedulesOfID,schedule);
         if(busy==1) {
             if (FileManager.checkOverlap(new Schedule(
                             schedule.ID, schedule.title, schedule.date, schedule.time, schedule.access, busy, schedule.cycleType, schedule.cycleHaltDate, schedule.memo),

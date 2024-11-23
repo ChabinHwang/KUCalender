@@ -297,6 +297,7 @@ public class FileManager {
     	int cycle1 = 0;
     	while(true) {
     		 for (Schedule schedule : schedules) { 
+    			 
     			 int cycle2 = 0;
     			 while(true) {
             		 
@@ -515,6 +516,7 @@ public class FileManager {
         } else {
             part = date.split(String.valueOf(seperator));
         }
+        
         String str = String.join("/", part[0], part[1], part[2]);
         
     	try {

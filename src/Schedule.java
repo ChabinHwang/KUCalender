@@ -79,7 +79,7 @@ public class Schedule {
                     System.out.println("메모 : "+memo);
                 break;
             case -1:
-                System.out.println("매주 "+FileManager.getDayOfWeek(partDate[0])+" "+partTime[0]+" ~ ("+FileManager.calculateDateDifference(partDate[0],partTime[1])+"일 뒤) "+FileManager.getDayOfWeek(partDate[1])+" "+partTime[1]+" - "+title);
+                System.out.println("매주 "+FileManager.getDayOfWeek(partDate[0])+" "+partTime[0]+" ~ ("+FileManager.calculateDateDifference(partDate[0],partDate[1])+"일 뒤) "+FileManager.getDayOfWeek(partDate[1])+" "+partTime[1]+" - "+title);
                 System.out.println("반복 기간 : "+partDate[0]+" ~ "+cycleHaltDate);
                 if(memo==null){
                     System.out.println("메모 : ");
@@ -88,7 +88,7 @@ public class Schedule {
                     System.out.println("메모 : "+memo);
                 break;
             case -2:
-                System.out.println("매달 "+FileManager.getDayOfYear(partDate[0])+"일 "+partTime[0]+" ~ ("+FileManager.calculateDateDifference(partDate[0],partTime[1])+"일 뒤) "+FileManager.getDayOfYear(partDate[1])+"일 "+partTime[1]+" - "+title);
+                System.out.println("매달 "+FileManager.getDayOfYear(partDate[0])+"일 "+partTime[0]+" ~ ("+FileManager.calculateDateDifference(partDate[0],partDate[1])+"일 뒤) "+FileManager.getDayOfYear(partDate[1])+"일 "+partTime[1]+" - "+title);
                 System.out.println("반복 기간 : "+partDate[0]+" ~ "+cycleHaltDate);
                 if(memo==null){
                     System.out.println("메모 : ");
