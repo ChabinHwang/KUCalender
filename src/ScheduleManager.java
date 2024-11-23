@@ -189,7 +189,7 @@ public class ScheduleManager {
         while(true) {
             System.out.print("반복여부와 반복종료일을 입력하세요(0:반복안함/1 2024.10.11:2024.10.11 까지 매주반복/2 2024.10.11:2024.10.11 까지 매달반복)\n>>");
             String input = Main.scan.nextLine();
-            if (!input.matches("^\\d \\d{4}([./_-])\\d{2}\\1\\d{2}$") || !input.matches("^\\d$")) {
+            if (!(input.matches("^\\d \\d{4}([./_-])\\d{2}\\1\\d{2}$") || input.matches("^0$"))) {
                 System.out.println("<오류: 올바른 형식이 아닙니다>");
                 continue;
             }
@@ -215,6 +215,7 @@ public class ScheduleManager {
                 continue;
             }
             break;
+            
         }
         while(true) {
             System.out.print("바쁨여부을 입력하세요(0: 안바쁨/1: 바쁨)\n>>");
@@ -232,12 +233,21 @@ public class ScheduleManager {
             }
             break;
         }
+        
+      //겹치는지 확인
         Schedule addSchedule = new Schedule(Main.user.getID(),title,date,time,access,busy,cycleType,cycleHaltDate,memo);
-
-        //겹치는지 확인
-        if(FileManager.checkOverlap(addSchedule,schedulesOfID)){
-            System.out.println("<오류: 바쁜일정과 다른 일정은 겹칠 수 없습니다>");
-            return;
+        if(busy==1) {
+            if (FileManager.checkOverlap(addSchedule,schedulesOfID))
+            {
+                System.out.println("<오류: 바쁜일정과 다른 일정은 겹칠 수 없습니다>");
+                return;
+            }
+        }
+        else{
+            if (FileManager.checkOverlap(addSchedule, busySchedulesOfID)) {
+                System.out.println("<오류: 바쁜일정과 다른 일정은 겹칠 수 없습니다>");
+                return;
+            }
         }
 
         //일정 등록
@@ -608,13 +618,14 @@ public class ScheduleManager {
         while(true) {
             System.out.print("반복여부와 반복종료일을 입력하세요(0:반복안함/1 2024.10.11:2024.10.11 까지 매주반복/2 2024.10.11:2024.10.11 까지 매달반복)\n>>");
             String input = Main.scan.nextLine();
-            if (!input.matches("^\\d \\d{4}([./_-])\\d{2}\\1\\d{2}$") || !input.matches("^\\d$")) {
+            if (!(input.matches("^\\d \\d{4}([./_-])\\d{2}\\1\\d{2}$") || input.matches("^0$"))) {
                 System.out.println("<오류: 올바른 형식이 아닙니다>");
                 continue;
             }
 
             String[] inputs = input.split(" ");
             cycleType = -Integer.parseInt(inputs[0]);
+            
             if (cycleType == 0) {
                 cycleHaltDate = "0000.00.00";
             } else
