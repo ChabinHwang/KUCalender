@@ -219,11 +219,11 @@ public class ScheduleManager {
                 continue;
             }
 
-            if (!FileManager.getInstance().isValidCycleHaltDate(cycleHaltDate)) {
+            if (cycleType!=0&&!FileManager.getInstance().isValidCycleHaltDate(cycleHaltDate)) {
                 System.out.println("<오류: 올바른 형식이 아닙니다>");
                 continue;
             }
-            if(!FileManager.isLater(part[1],cycleHaltDate)){
+            if(cycleType!=0&&!FileManager.isLater(part[1],cycleHaltDate)){
                 System.out.println("<오류: 반복종료일은 첫 번째 반복일정의 종료일보다 나중이어야 합니다>");
                 continue;
             }
@@ -651,11 +651,11 @@ public class ScheduleManager {
                 continue;
             }
 
-            if (!FileManager.getInstance().isValidCycleHaltDate(cycleHaltDate)) {
+            if (cycleType!=0&&!FileManager.getInstance().isValidCycleHaltDate(cycleHaltDate)) {
                 System.out.println("<오류: 올바른 형식이 아닙니다>");
                 continue;
             }
-            if(!FileManager.isLater(schedule.date.split(" ")[1],cycleHaltDate)){
+            if(cycleType!=0&&!FileManager.isLater(schedule.date.split(" ")[1],cycleHaltDate)){
                 System.out.println("<오류: 반복종료일은 첫 번째 반복일정의 종료일보다 나중이어야 합니다>");
                 continue;
             }
