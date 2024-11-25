@@ -292,7 +292,7 @@ public class FileManager {
         return part[0]+"/"+part[1]+"/"+part[2];
     }
 
-    public static boolean checkOverlap(Schedule checkSchedule, ArrayList<Schedule> schedules) { 
+    public static boolean checkOverlap(Schedule checkSchedule, ArrayList<Schedule> schedules) {
     	int result=-1;
     	int cycle1 = 0;
     	while(true) {
@@ -308,13 +308,26 @@ public class FileManager {
     				 if(schedule.cycleType==0){
     					 break;
     				 }
+
     				 cycle2++;
             	 }
 	            
     		 }
-    		 if(result==-1)return false;
+
+
     		 if(checkSchedule.cycleType==0)
     			 break;
+             else if(checkSchedule.busy==1){
+                 int cycle3 = 0;
+                 while(true) {
+                     int result2 = processRecurringSchedule(checkSchedule,cycle1,checkSchedule,cycle3);
+                     if(result2==1)  return true;
+                     else if(result2==2)return false;
+                     else if(result2==3)break;
+                     cycle3++;
+                 }
+             }
+             else if(result==-1)return false;//비교할게 없음
     		 cycle1++;
     	}
        
