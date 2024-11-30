@@ -253,14 +253,6 @@ public class FileManager {
     	if(day>=10)return String.valueOf(day);
     	else return "0"+String.valueOf(day);
     }
-    
-    public static String getDayOfYear(LocalDate date) {
-    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-    	String str = date.format(formatter);
-    	int day= Integer.parseInt(str.split("/")[1]);
-    	if(day>=10)return String.valueOf(day);
-    	else return "0"+String.valueOf(day);
-    }
 
     //겹치는거 확인하는 메소드
     public static boolean areSchedulesNonOverlapping(String AstartDate, String AstartTime,String AendDate,String AendTime,String BstartDate, String BstartTime,String BendDate,String BendTime) {
@@ -277,7 +269,8 @@ public class FileManager {
         LocalDateTime startB = LocalDateTime.parse(pBstartDate +" "+ BstartTime, formatter);
         LocalDateTime endB = LocalDateTime.parse(pBendDate +" "+ BendTime, formatter);
 
-        // 두 일정이 겹치지 않거나 동일한 경우
+        //System.out.println(AstartDate+" "+AstartTime+"\t"+AendDate+" "+AendTime+"\t"+BstartDate+" "+BstartTime+"\t"+BendDate+" "+BendTime);
+        // 두 일정이 겹치지 않거나 동일한 경우(동일한 경우는 안되는듯)
         return endA.isBefore(startB) || endB.isBefore(startA);
     }
     
@@ -314,13 +307,18 @@ public class FileManager {
 	            
     		 }
 
-
     		 if(checkSchedule.cycleType==0)
     			 break;
              else if(checkSchedule.busy==1){
                  int cycle3 = 0;
                  while(true) {
+
                      int result2 = processRecurringSchedule(checkSchedule,cycle1,checkSchedule,cycle3);
+
+                     if(cycle1==cycle3){
+                         cycle3++;
+                         continue;
+                     }
                      if(result2==1)  return true;
                      else if(result2==2)return false;
                      else if(result2==3)break;
@@ -407,7 +405,7 @@ public class FileManager {
 		String s1sd = schedule1.date.split(" ")[0]; 
 		String s1ed = schedule1.date.split(" ")[1];
 		String s1st = schedule1.time.split(" ")[0];
-		String s1et = schedule1.time.split(" ")[0];
+		String s1et = schedule1.time.split(" ")[1];
 		String s2sd = schedule2.date.split(" ")[0];
 		String s2ed = schedule2.date.split(" ")[1];
 		String s2st = schedule2.time.split(" ")[0];
@@ -494,12 +492,17 @@ public class FileManager {
 		String Sns1sd = parseDateToString(ns1sd); 
 		String Sns1ed = parseDateToString(ns1ed); 
 		String Sns2sd = parseDateToString(ns2sd); 
-		String Sns2ed = parseDateToString(ns2ed); 
-		
-		if(!isLater(schedule1.cycleHaltDate,Sns1ed))
-			return 2;
-		if(!isLater(schedule2.cycleHaltDate,Sns2ed))
-			return 3;
+		String Sns2ed = parseDateToString(ns2ed);
+
+		if(!isSameOrLater(Sns1ed,schedule1.cycleHaltDate))
+        {
+            //System.out.println(schedule1.cycleHaltDate+" "+Sns1ed);
+            return 2;
+        }
+		if(!isSameOrLater(Sns2ed,schedule2.cycleHaltDate))
+        {
+            return 3;
+        }
 		
 		if(areSchedulesNonOverlapping(Sns1sd,s1st,Sns1ed,s1et,Sns2sd,s2st,Sns2ed,s2et))
 			return 0;
@@ -510,7 +513,8 @@ public class FileManager {
     public static LocalDate getSameDayAfterMonths(String dateString, int months) {
     	LocalDate date = parsingDate(dateString);
     	LocalDate newDate = date.plusMonths(months);
-    	if(!getDayOfYear(dateString).equals(getDayOfYear(newDate)))return null;
+
+    	if(date.getDayOfMonth()!=(newDate.getDayOfMonth()))return null;
     	return newDate;
     }
     

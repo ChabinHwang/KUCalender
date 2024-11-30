@@ -401,9 +401,9 @@ public class ScheduleManager {
             System.out.println("2.날짜 수정");
             System.out.println("3.시간 수정");
             System.out.println("4.메모 수정");
-            System.out.println("5.메모 수정");
-            System.out.println("6.메모 수정");
-            System.out.println("7.메모 수정");
+            System.out.println("5.공개여부 수정");
+            System.out.println("6.반복 수정");
+            System.out.println("7.바쁨 수정");
             System.out.println("8.돌아가기");
             System.out.println("--------------------------------------------");
             System.out.print("메뉴를 선택해주세요\n>>");
