@@ -246,12 +246,6 @@ public class FileManager {
         return (int) java.time.temporal.ChronoUnit.DAYS.between(startDate, endDate);
         
     }
-    //날짜 = 날짜 + 일
-    public static LocalDate addDaysToDate(String startDateString, int daysToAdd) {
-        LocalDate startDate = parsingDate(startDateString);
-        return startDate.plusDays(daysToAdd);
-        
-    }
 
     //일 뽑기
     public static String getDayOfYear(String date) {
