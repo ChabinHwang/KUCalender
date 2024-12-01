@@ -114,7 +114,14 @@ public class FileManager {
 
         // 문자열을 LocalDate로 변환
         LocalDate parsedDate1 = parsingDate(date1);
-        LocalDate parsedDate2 = parsingDate(date2);
+        LocalDate parsedDate2 = null;
+        if(date2.equals("0000.00.00"))
+        {
+            parsedDate2 = parsingDate("2099.12.31");
+        }
+        else{
+            parsedDate2 = parsingDate(date2);
+        }
 
         if(parsedDate1==null||parsedDate2==null)return false;
         
