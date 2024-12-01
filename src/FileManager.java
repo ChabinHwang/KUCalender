@@ -494,12 +494,12 @@ public class FileManager {
 		String Sns2sd = parseDateToString(ns2sd); 
 		String Sns2ed = parseDateToString(ns2ed);
 
-		if(!isSameOrLater(Sns1ed,schedule1.cycleHaltDate))
+		if(schedule1.cycleType!=0&&!isSameOrLater(Sns1ed,schedule1.cycleHaltDate))
         {
             //System.out.println(schedule1.cycleHaltDate+" "+Sns1ed);
             return 2;
         }
-		if(!isSameOrLater(Sns2ed,schedule2.cycleHaltDate))
+		if(schedule2.cycleType!=0&&!isSameOrLater(Sns2ed,schedule2.cycleHaltDate))
         {
             return 3;
         }
